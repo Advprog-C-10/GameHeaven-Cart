@@ -65,7 +65,7 @@ jobs:
 
       - name: Test with Gradle
         run: |
-          ./gradlew check --info --stacktrace
+          ./gradlew check --scan --info --stacktrace
           ./gradlew test
           ./gradlew jacocoTestReport
 
