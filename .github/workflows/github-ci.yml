@@ -27,20 +27,11 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-
-      - name: Replace placeholders in application-prod.properties
-        run: |
-          sed -i 's|${PRODUCTION}|'"${{ secrets.PRODUCTION }}"'|g' src/main/resources/application.properties
-          sed -i 's|${JDBC_DATABASE_URL}|'"${{ secrets.JDBC_DATABASE_URL }}"'|g' src/main/resources/application-prod.properties
-          sed -i 's|${JDBC_DATABASE_USERNAME}|'"${{ secrets.JDBC_DATABASE_USERNAME }}"'|g' src/main/resources/application-prod.properties
-          sed -i 's|${JDBC_DATABASE_PASSWORD}|'"${{ secrets.JDBC_DATABASE_PASSWORD }}"'|g' src/main/resources/application-prod.properties
-          sed -i 's|${JWT_SECRET}|'"${{ secrets.JWT_SECRET }}"'|g' src/main/resources/application-prod.properties
       - name: Build with Gradle
-        run: ./gradlew assemble
-
+        run: |
+          ./gradlew assemble
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -54,17 +45,14 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           distribution: "temurin"
           java-version: "21"
           cache: "gradle"
-
       - name: Make gradlew executable
         run: chmod +x ./gradlew
-
       - name: Cache Gradle dependencies
         uses: actions/cache@v4
         with:
@@ -80,18 +68,18 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
+      - name: check directory
+        run: ls -la
       - name: Download Artifact
         uses: actions/download-artifact@v4
         with:
           name: java-app
-
+      - name: check directory
+        run: ls -la
       - name: Docker login
         run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.REGISTRY_USER }} --password-stdin docker.io
-
       - name: Set Docker BuildKit
         run: export DOCKER_BUILDKIT=1
-
       - name: Build Docker Image
         run: |
           docker build \
@@ -99,7 +87,6 @@ jobs:
               --build-arg JDBC_DATABASE_PASSWORD=${{ secrets.JDBC_DATABASE_PASSWORD }} \
               --build-arg JDBC_DATABASE_URL=${{ secrets.JDBC_DATABASE_URL }} \
               --build-arg JDBC_DATABASE_USERNAME=${{ secrets.JDBC_DATABASE_USERNAME }} \
-              --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
               -t ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }} \
               .  
           docker push ${{ secrets.REGISTRY_USER }}/${{ secrets.IMAGE_NAME }}:${{ secrets.IMAGE_TAG }}
@@ -111,16 +98,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Install SSH client
         run: sudo apt-get install openssh-client
-
-      - name: Create SSH key
+      - name: create ssh key
         run: echo "${{ secrets.SSH_KEY }}" > ssh-key.pem
-
-      - name: Update permission
+      - name: update permission
         run: chmod 400 ssh-key.pem
-
       - name: Deploy to GCP
         run: |
           ssh -o StrictHostKeyChecking=no -i ssh-key.pem ${{ secrets.GCP_USERNAME }}@${{ secrets.GCP_STATIC_IP }} "
