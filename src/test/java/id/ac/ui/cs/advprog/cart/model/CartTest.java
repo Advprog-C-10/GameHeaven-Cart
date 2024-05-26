@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.cart.model;
 
+import id.ac.ui.cs.advprog.cart.factory.CartFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,10 +11,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class CartTest {
 
     private Cart cart;
+    private final CartFactory cartFactory = new CartFactory();
 
     @BeforeEach
     void setUp() {
-        cart = new Cart("userId", "productId", "productName", 100, "description", 2);
+        cart = cartFactory.create("userId", "productId", "productName", 100, "description", 2);
     }
 
     @Test
@@ -100,7 +102,7 @@ class CartTest {
     }
     @Test
     void testDefaultConstructor() {
-        Cart cart = new Cart();
+        Cart cart = cartFactory.create();
         assertNotNull(cart.getId());
         assertNotNull(cart.getDateCart());
         assertTrue(cart.getDateCart().isBefore(LocalDateTime.now()) || cart.getDateCart().isEqual(LocalDateTime.now()));
@@ -115,7 +117,7 @@ class CartTest {
         String productDescription = "description";
         Integer quantity = 2;
 
-        Cart cart = new Cart(userId, productId, productName, productPrice, productDescription, quantity);
+        Cart cart = cartFactory.create(userId, productId, productName, productPrice, productDescription, quantity);
 
         assertNotNull(cart.getId());
         assertEquals(userId, cart.getUserId());
@@ -130,14 +132,14 @@ class CartTest {
 
     @Test
     void testSetQuantityValid() {
-        Cart cart = new Cart();
+        Cart cart = cartFactory.create();
         cart.setQuantity(5);
         assertEquals(5, cart.getQuantity());
     }
 
     @Test
     void testSetQuantityInvalid() {
-        Cart cart = new Cart();
+        Cart cart = cartFactory.create();
         assertThrows(IllegalArgumentException.class, () -> cart.setQuantity(0));
         assertThrows(IllegalArgumentException.class, () -> cart.setQuantity(11));
     }
