@@ -1,5 +1,6 @@
 package id.ac.ui.cs.advprog.cart.model;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -8,6 +9,95 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CartTest {
 
+    private Cart cart;
+
+    @BeforeEach
+    void setUp() {
+        cart = new Cart("userId", "productId", "productName", 100, "description", 2);
+    }
+
+    @Test
+    void testGetCartId() {
+        assertNotNull(cart.getId());
+    }
+
+    @Test
+    void testGetUserId() {
+        assertEquals("userId", cart.getUserId());
+    }
+
+    @Test
+    void testGetProductId() {
+        assertEquals("productId", cart.getProductId());
+    }
+
+    @Test
+    void testGetProductName() {
+        assertEquals("productName", cart.getProductName());
+    }
+
+    @Test
+    void testGetProductPrice() {
+        assertEquals(100, cart.getProductPrice());
+    }
+
+    @Test
+    void testGetProductDescription() {
+        assertEquals("description", cart.getProductDescription());
+    }
+
+    @Test
+    void testGetQuantity() {
+        assertEquals(2, cart.getQuantity());
+    }
+
+    @Test
+    void testGetDateCart() {
+        assertNotNull(cart.getDateCart());
+        assertTrue(cart.getDateCart().isBefore(LocalDateTime.now()) || cart.getDateCart().isEqual(LocalDateTime.now()));
+    }
+
+    @Test
+    void testSetUserId() {
+        String userId = "newUserId";
+        cart.setUserId(userId);
+        assertEquals(userId, cart.getUserId());
+    }
+
+    @Test
+    void testSetProductId() {
+        String productId = "newProductId";
+        cart.setProductId(productId);
+        assertEquals(productId, cart.getProductId());
+    }
+
+    @Test
+    void testSetProductName() {
+        String productName = "newProductName";
+        cart.setProductName(productName);
+        assertEquals(productName, cart.getProductName());
+    }
+
+    @Test
+    void testSetProductPrice() {
+        Integer productPrice = 200;
+        cart.setProductPrice(productPrice);
+        assertEquals(productPrice, cart.getProductPrice());
+    }
+
+    @Test
+    void testSetProductDescription() {
+        String productDescription = "newDescription";
+        cart.setProductDescription(productDescription);
+        assertEquals(productDescription, cart.getProductDescription());
+    }
+
+    @Test
+    void testSetDateCart() {
+        LocalDateTime dateCart = LocalDateTime.now().minusDays(1);
+        cart.setDateCart(dateCart);
+        assertEquals(dateCart, cart.getDateCart());
+    }
     @Test
     void testDefaultConstructor() {
         Cart cart = new Cart();
